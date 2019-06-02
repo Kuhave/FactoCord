@@ -65,8 +65,8 @@ func main() {
 			// If the process is already running DO NOT RUN IT AGAIN
 			if !Running {
 				if *UpdateCmd == 1 || *UpdateCmd == 3 { //factorio update
-					if support.Config.ModUpdaterLocation == "" {
-						Session.ChannelMessageSend(support.Config.FactorioChannelID, "mods updater path not found.")
+					if support.Config.UpdaterLocation == "" {
+						Session.ChannelMessageSend(support.Config.FactorioChannelID, "factorio updater path not found.")
 					} else {
 						experimental := ""
 						if *UpdateCmd == 3 {
@@ -147,14 +147,17 @@ func main() {
 	go func() {
 		Console := bufio.NewReader(os.Stdin)
 		for {
-			line, _, err := Console.ReadLine()
-			if err != nil {
-				support.ErrorLog(fmt.Errorf("%s: An error occurred when attempting to read the input to pass as input to the console\nDetails: %s", time.Now(), err))
+			if *UpdateCmd == 0 {
+				line, _, err := Console.ReadLine()
+				if err != nil {
+					support.ErrorLog(fmt.Errorf("%s: An error occurred when attempting to read the input to pass as input to the console\nDetails: %s", time.Now(), err))
+				}
+				_, err = io.WriteString(Pipe, fmt.Sprintf("%s\n", line))
+				if err != nil {
+					support.ErrorLog(fmt.Errorf("%s: An error occurred when attempting to pass input to the console\nDetails: %s", time.Now(), err))
+				}
 			}
-			_, err = io.WriteString(Pipe, fmt.Sprintf("%s\n", line))
-			if err != nil {
-				support.ErrorLog(fmt.Errorf("%s: An error occurred when attempting to pass input to the console\nDetails: %s", time.Now(), err))
-			}
+
 		}
 	}()
 
@@ -222,9 +225,11 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 			return
 		}
 		// Pipes normal chat allowing it to be seen ingame
-		_, err := io.WriteString(Pipe, fmt.Sprintf("[Discord] <%s>: %s\r\n", m.Author.Username, m.ContentWithMentionsReplaced()))
-		if err != nil {
-			support.ErrorLog(fmt.Errorf("%s: An error occurred when attempting to pass Discord chat to in-game\nDetails: %s", time.Now(), err))
+		if *UpdateCmd == 0 {
+			_, err := io.WriteString(Pipe, fmt.Sprintf("[Discord] <%s>: %s\r\n", m.Author.Username, m.ContentWithMentionsReplaced()))
+			if err != nil {
+				support.ErrorLog(fmt.Errorf("%s: An error occurred when attempting to pass Discord chat to in-game\nDetails: %s", time.Now(), err))
+			}
 		}
 		return
 	}
