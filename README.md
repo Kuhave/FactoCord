@@ -41,6 +41,13 @@ You will need to add these lib as go get:
 
 To compile just do `go build`
 
+# $update, $update-mods commands support
+
+The following packages are required to use `$update`, `$update-mods` commands.
+
+[factorio-updater]() for factorio version update.
+
+[factorio-mod-updater](https://github.com/astevens/factorio-mod-updater) for mods update.
 
 # Error reporting
 

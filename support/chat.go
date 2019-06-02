@@ -17,21 +17,26 @@ var SaveResult int
 var UserListResult int
 var OnlineUserList *list.List
 
+var QuitFlag int
+
 // Chat pipes in-game chat to Discord.
 func Chat(s *discordgo.Session, _ *discordgo.MessageCreate) {
 	SaveResult = 0
 	UserListResult = 0
+	QuitFlag = 0
 
 	OnlineUserList = list.New()
 
 	idMap := map[int]string{}
 
+	onlineUserCount := 0
+
 	r_join := regexp.MustCompile("received stateChanged peerID\\((\\d+)\\) oldState\\(WaitingForCommandToStartSendingTickClosures\\) newState\\(InGame\\)")
 	r_disconnect := regexp.MustCompile("nextHeartbeatSequenceNumber\\(\\d+\\) removing peer\\((\\d+)\\).")
 	r_save := regexp.MustCompile("Info AppManagerStates.cpp:\\d+: Saving finished")
 	r_online := regexp.MustCompile("Online players? \\((\\d+)\\)")
-	onlineUserCount := 0
 	r_online_name := regexp.MustCompile("(\\w+) \\(online\\)")
+	r_goodbye := regexp.MustCompile("\\d+\\.\\d+ Goodbye")
 
 	newcomer := -1
 	left := ""
@@ -101,22 +106,20 @@ func Chat(s *discordgo.Session, _ *discordgo.MessageCreate) {
 			} else if SaveResult == 1 && r_save.MatchString(line.Text) {
 				SaveResult = 2
 			} else if UserListResult == 1 && r_online.MatchString(line.Text) {
-				fmt.Println("유저리스트 요청 접수")
 				UserListResult = 2
 				onlineUserCount, _ = strconv.Atoi(r_online.FindStringSubmatch(line.Text)[1])
 				if onlineUserCount == 0 {
-					OnlineUserList.PushBack("No one is online..")
 					UserListResult = 4
 				}
 
 			} else if UserListResult == 2 && r_online_name.MatchString(line.Text) {
-				fmt.Println("유저리스트 요청 처리중, 유저 이름 나옴")
 				onlineUserCount--
 				OnlineUserList.PushBack(r_online_name.FindStringSubmatch(line.Text)[1])
 				if onlineUserCount == 0 {
-					fmt.Println("유저리스트 요청 리턴(있는경우)")
 					UserListResult = 3
 				}
+			} else if QuitFlag == 1 && r_goodbye.MatchString(line.Text) {
+				QuitFlag = 2
 			}
 		}
 		time.Sleep(500 * time.Millisecond)

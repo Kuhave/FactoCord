@@ -13,3 +13,9 @@ Prefix = "$"
 ModListLocation = "/path/to/mods/mod-list.json"
 
 GameName = "Factorio"
+
+ModUpdaterLocation = "/path/to/factorio-mod-updater/factorio-mod-updater"
+
+ModUpdaterServerSetting = "/path/to/server-settings.json"
+
+UpdaterLocation = "/path/to/factorio-updater/update_factorio.py"
