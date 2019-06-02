@@ -3,9 +3,9 @@ package commands
 import (
 	"strings"
 
-	"github.com/FactoKit/FactoCord/commands/admin"
-	"github.com/FactoKit/FactoCord/commands/utils"
-	"github.com/FactoKit/FactoCord/support"
+	"../support"
+	"./admin"
+	"./utils"
 	"github.com/bwmarrin/discordgo"
 )
 
@@ -36,6 +36,8 @@ func RegisterCommands() {
 
 	// Util Commands
 	CL.CommandList = append(CL.CommandList, Command{Name: "Mods", Command: utils.ModsList,
+		Admin: false})
+	CL.CommandList = append(CL.CommandList, Command{Name: "Online", Command: utils.OnlineList,
 		Admin: false})
 }
 

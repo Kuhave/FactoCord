@@ -13,9 +13,10 @@ import (
 	"syscall"
 	"time"
 
-	"./support"
 	"./commands"
 	"./commands/admin"
+	"./commands/utils"
+	"./support"
 	"github.com/bwmarrin/discordgo"
 	_ "github.com/joho/godotenv/autoload"
 )
@@ -33,6 +34,9 @@ func main() {
 	support.Config.LoadEnv()
 	Running = false
 	admin.R = &Running
+	admin.SaveResult = &support.SaveResult
+	utils.UserList = &support.OnlineUserList
+	utils.UserListResult = &support.UserListResult
 
 	// Do not exit the app on this error.
 	if err := os.Remove("factorio.log"); err != nil {
@@ -110,6 +114,7 @@ func discord() {
 	discordToken := support.Config.DiscordToken
 	commands.RegisterCommands()
 	admin.P = &Pipe
+	utils.P = &Pipe
 	fmt.Println("Starting bot..")
 	bot, err := discordgo.New("Bot " + discordToken)
 	Session = bot
@@ -129,8 +134,7 @@ func discord() {
 
 	bot.AddHandler(messageCreate)
 	bot.AddHandlerOnce(support.Chat)
-	time.Sleep(3 * time.Second)
-	bot.ChannelMessageSend(support.Config.FactorioChannelID, "The server has started!")
+	bot.ChannelMessageSend(support.Config.FactorioChannelID, "The server is booting...")
 	bot.UpdateStatus(0, support.Config.GameName)
 	fmt.Println("Bot is now running.  Press CTRL-C to exit.")
 	sc := make(chan os.Signal, 1)
