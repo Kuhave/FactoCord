@@ -21,6 +21,7 @@ type config struct {
 	GameName                string
 	ModUpdaterLocation      string
 	ModUpdaterServerSetting string
+	UpdaterLocation         string
 }
 
 func (conf *config) LoadEnv() {
@@ -41,6 +42,7 @@ func (conf *config) LoadEnv() {
 		GameName:                os.Getenv("GameName"),
 		ModUpdaterLocation:      os.Getenv("ModUpdaterLocation"),
 		ModUpdaterServerSetting: os.Getenv("ModUpdaterServerSetting"),
+		UpdaterLocation:         os.Getenv("UpdaterLocation"),
 	}
 
 }

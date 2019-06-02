@@ -35,6 +35,8 @@ func RegisterCommands() {
 		Admin: true})
 	CL.CommandList = append(CL.CommandList, Command{Name: "Update", Command: admin.Update,
 		Admin: true})
+	CL.CommandList = append(CL.CommandList, Command{Name: "Update-experimental", Command: admin.UpdateExp,
+		Admin: true})
 	CL.CommandList = append(CL.CommandList, Command{Name: "Update-mods", Command: admin.UpdateMod,
 		Admin: true})
 

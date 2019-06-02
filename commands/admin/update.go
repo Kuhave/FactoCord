@@ -14,11 +14,45 @@ func Update(s *discordgo.Session, m *discordgo.MessageCreate) {
 		s.ChannelMessageSend(support.Config.FactorioChannelID, "Server is not running!")
 		return
 	}
-	io.WriteString(*P, "/save\n")
+
+	s.ChannelMessageSend(support.Config.FactorioChannelID, "Server received factorio client update command.")
+	*QuitFlag = 1
 	io.WriteString(*P, "/quit\n")
-	s.ChannelMessageSend(support.Config.FactorioChannelID, "Saved server, now restarting!")
-	time.Sleep(3 * time.Second)
+	time.Sleep(600 * time.Millisecond)
+	for {
+		if *QuitFlag == 2 {
+			s.ChannelMessageSend(support.Config.FactorioChannelID, "server is closed.")
+			*QuitFlag = 0
+			break
+		}
+	}
+
 	*R = false
-	RestartCount = RestartCount + 1
+	UpdateCmd = 1
+
+	return
+}
+
+func UpdateExp(s *discordgo.Session, m *discordgo.MessageCreate) {
+	if *R == false {
+		s.ChannelMessageSend(support.Config.FactorioChannelID, "Server is not running!")
+		return
+	}
+
+	s.ChannelMessageSend(support.Config.FactorioChannelID, "Server received factorio client experimental update command.")
+	*QuitFlag = 1
+	io.WriteString(*P, "/quit\n")
+	time.Sleep(600 * time.Millisecond)
+	for {
+		if *QuitFlag == 2 {
+			s.ChannelMessageSend(support.Config.FactorioChannelID, "server is closed.")
+			*QuitFlag = 0
+			break
+		}
+	}
+
+	*R = false
+	UpdateCmd = 3
+
 	return
 }

@@ -64,7 +64,40 @@ func main() {
 		for {
 			// If the process is already running DO NOT RUN IT AGAIN
 			if !Running {
-				if *UpdateCmd == 2 { //mod update
+				if *UpdateCmd == 1 || *UpdateCmd == 3 { //factorio update
+					if support.Config.ModUpdaterLocation == "" {
+						Session.ChannelMessageSend(support.Config.FactorioChannelID, "mods updater path not found.")
+					} else {
+						experimental := ""
+						if *UpdateCmd == 3 {
+							experimental = "x"
+						}
+
+						mod_param := fmt.Sprintf("%s -%sDa %s", support.Config.UpdaterLocation, experimental, support.Config.Executable)
+						mod_params := strings.Split(mod_param, " ")
+
+						cmd_mod := exec.Command("python3", mod_params...)
+						cmd_mod.Stderr = os.Stderr
+						cmd_mod.Stdout = mwriter
+
+						err := cmd_mod.Run()
+						fmt.Printf("%T", err)
+						fmt.Println(err)
+
+						if err != nil {
+							if exitError, ok := err.(*exec.ExitError); ok {
+								waitStatus := exitError.Sys().(syscall.WaitStatus)
+								if waitStatus.ExitStatus() == 2 {
+									Session.ChannelMessageSend(support.Config.FactorioChannelID, "There is no update. restarting server..")
+								}
+							} else {
+								Session.ChannelMessageSend(support.Config.FactorioChannelID, "Factorio update failed. Restart server anyway..")
+							}
+						} else {
+							Session.ChannelMessageSend(support.Config.FactorioChannelID, "Factorio updated successful! restarting server..")
+						}
+					}
+				} else if *UpdateCmd == 2 { //mod update
 					if support.Config.ModUpdaterLocation == "" {
 						Session.ChannelMessageSend(support.Config.FactorioChannelID, "mods updater path not found.")
 					} else {
@@ -76,6 +109,8 @@ func main() {
 						mod_params := strings.Split(mod_param, " ")
 
 						cmd_mod := exec.Command(support.Config.ModUpdaterLocation, mod_params...)
+						cmd_mod.Stderr = os.Stderr
+						cmd_mod.Stdout = mwriter
 
 						err := cmd_mod.Run()
 						if err != nil {
