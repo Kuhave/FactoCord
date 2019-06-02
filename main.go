@@ -30,13 +30,19 @@ var Pipe io.WriteCloser
 // Session is a discordgo session
 var Session *discordgo.Session
 
+var UpdateCmd *int
+
 func main() {
 	support.Config.LoadEnv()
 	Running = false
 	admin.R = &Running
 	admin.SaveResult = &support.SaveResult
+	admin.QuitFlag = &support.QuitFlag
+	UpdateCmd = &admin.UpdateCmd
 	utils.UserList = &support.OnlineUserList
 	utils.UserListResult = &support.UserListResult
+
+	*UpdateCmd = 0
 
 	// Do not exit the app on this error.
 	if err := os.Remove("factorio.log"); err != nil {
@@ -58,6 +64,27 @@ func main() {
 		for {
 			// If the process is already running DO NOT RUN IT AGAIN
 			if !Running {
+				if *UpdateCmd == 2 { //mod update
+					if support.Config.ModUpdaterLocation == "" {
+						Session.ChannelMessageSend(support.Config.FactorioChannelID, "mods updater path not found.")
+					} else {
+						departed := strings.Split(support.Config.Executable, "/")
+						pathsize := len(departed)
+						test := strings.Join(departed[:pathsize-3], "/")
+
+						mod_param := fmt.Sprintf("-p %s -s %s", test, support.Config.ModUpdaterServerSetting)
+						mod_params := strings.Split(mod_param, " ")
+
+						cmd_mod := exec.Command(support.Config.ModUpdaterLocation, mod_params...)
+
+						err := cmd_mod.Run()
+						if err != nil {
+							Session.ChannelMessageSend(support.Config.FactorioChannelID, "mods update failed. Start server anyway..")
+						} else {
+							Session.ChannelMessageSend(support.Config.FactorioChannelID, "mods updated successful! starting server..")
+						}
+					}
+				}
 				Running = true
 				cmd := exec.Command(support.Config.Executable, support.Config.LaunchParameters...)
 				cmd.Stderr = os.Stderr

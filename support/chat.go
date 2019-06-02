@@ -36,7 +36,7 @@ func Chat(s *discordgo.Session, _ *discordgo.MessageCreate) {
 	r_save := regexp.MustCompile("Info AppManagerStates.cpp:\\d+: Saving finished")
 	r_online := regexp.MustCompile("Online players? \\((\\d+)\\)")
 	r_online_name := regexp.MustCompile("(\\w+) \\(online\\)")
-	r_goodbye := regexp.MustCompile("\\d+\\.\\d Goodbye")
+	r_goodbye := regexp.MustCompile("\\d+\\.\\d+ Goodbye")
 
 	newcomer := -1
 	left := ""
@@ -109,7 +109,6 @@ func Chat(s *discordgo.Session, _ *discordgo.MessageCreate) {
 				UserListResult = 2
 				onlineUserCount, _ = strconv.Atoi(r_online.FindStringSubmatch(line.Text)[1])
 				if onlineUserCount == 0 {
-					OnlineUserList.PushBack("No one is online..")
 					UserListResult = 4
 				}
 

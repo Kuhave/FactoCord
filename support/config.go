@@ -11,14 +11,16 @@ import (
 var Config config
 
 type config struct {
-	DiscordToken      string
-	FactorioChannelID string
-	Executable        string
-	LaunchParameters  []string
-	AdminIDs          []string
-	Prefix            string
-	ModListLocation   string
-	GameName          string
+	DiscordToken            string
+	FactorioChannelID       string
+	Executable              string
+	LaunchParameters        []string
+	AdminIDs                []string
+	Prefix                  string
+	ModListLocation         string
+	GameName                string
+	ModUpdaterLocation      string
+	ModUpdaterServerSetting string
 }
 
 func (conf *config) LoadEnv() {
@@ -29,14 +31,16 @@ func (conf *config) LoadEnv() {
 	}
 
 	Config = config{
-		DiscordToken:      os.Getenv("DiscordToken"),
-		FactorioChannelID: os.Getenv("FactorioChannelID"),
-		LaunchParameters:  strings.Split(os.Getenv("LaunchParameters"), " "),
-		Executable:        os.Getenv("Executable"),
-		AdminIDs:          strings.Split(os.Getenv("AdminIDs"), ","),
-		Prefix:            os.Getenv("Prefix"),
-		ModListLocation:   os.Getenv("ModListLocation"),
-		GameName:          os.Getenv("GameName"),
+		DiscordToken:            os.Getenv("DiscordToken"),
+		FactorioChannelID:       os.Getenv("FactorioChannelID"),
+		LaunchParameters:        strings.Split(os.Getenv("LaunchParameters"), " "),
+		Executable:              os.Getenv("Executable"),
+		AdminIDs:                strings.Split(os.Getenv("AdminIDs"), ","),
+		Prefix:                  os.Getenv("Prefix"),
+		ModListLocation:         os.Getenv("ModListLocation"),
+		GameName:                os.Getenv("GameName"),
+		ModUpdaterLocation:      os.Getenv("ModUpdaterLocation"),
+		ModUpdaterServerSetting: os.Getenv("ModUpdaterServerSetting"),
 	}
 
 }
